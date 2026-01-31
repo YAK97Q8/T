@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine</title>
+  <style>
+    :root{
+      --pink:#ff4fa0;
+      --pink2:#ff7bbf;
+      --card:rgba(255,255,255,.90);
+      --shadow:0 18px 45px rgba(0,0,0,.12);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
+      background:
+        radial-gradient(1200px 700px at 20% 20%, #ffd1e4 0%, transparent 60%),
+        radial-gradient(1200px 700px at 80% 30%, #ffe0ef 0%, transparent 55%),
+        linear-gradient(135deg, #ffb9d6, #ffd8ea 55%, #ffbfe0);
+    }
+
+    .card{
+      width:min(560px,92vw);
+      padding:38px 26px;
+      border-radius:var(--radius);
+      background:var(--card);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.55);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+
+    /* CSS heart ABOVE text (no emoji) */
+    .heartWrap{
+      display:flex;
+      justify-content:center;
+      margin: 6px 0 18px;
+    }
+    .heart{
+      width:56px; height:56px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      position:relative;
+      transform: rotate(45deg);
+      border-radius:12px;
+      box-shadow: 0 16px 35px rgba(255,79,160,.35);
+    }
+    .heart:before,.heart:after{
+      content:"";
+      position:absolute;
+      width:56px; height:56px;
+      background:inherit;
+      border-radius:50%;
+    }
+    .heart:before{ left:-28px; top:0; }
+    .heart:after{ left:0; top:-28px; }
+
+    h1{
+      margin:0 0 10px;
+      font-size: clamp(26px, 4.2vw, 40px);
+      line-height:1.12;
+      letter-spacing:-.4px;
+      color:#1f1f1f;
+    }
+    .name{ font-weight:900; display:block; }
+    p{ margin:0 0 18px; opacity:.75; }
+
+    /* Buttons side by side; No moves inside this area */
+    .arena{
+      position:relative;
+      width:min(520px,92vw);
+      height:120px;      /* bigger area = farther jumps */
+      margin: 6px auto 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+    }
+
+    button{
+      border:none;
+      font-size:18px;
+      font-weight:900;
+      padding:16px 34px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #yes{
+      min-width:160px;
+      background:linear-gradient(135deg,var(--pink),var(--pink2));
+      color:#fff;
+      box-shadow:0 18px 40px rgba(255,79,160,.35);
+      position:relative;
+      z-index:1;
+    }
+
+    #no{
+      min-width:140px;
+      background:#fff;
+      color:#222;
+      box-shadow:0 14px 30px rgba(0,0,0,.15);
+      position:absolute;
+      left:18px;
+      top:40px;
+      z-index:2;
+      touch-action:none;
+    }
+
+    .hint{
+      margin-top:14px;
+      font-size:14px;
+      opacity:.6;
+    }
+
+    /* modal */
+    .modal{
+      position:fixed; inset:0;
+      display:none;
+      place-items:center;
+      background:rgba(0,0,0,.30);
+      backdrop-filter: blur(6px);
+      padding:18px;
+    }
+    .modal.show{ display:grid; }
+    .box{
+      width:min(520px,92vw);
+      background:rgba(255,255,255,.95);
+      padding:28px 22px;
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.6);
+      text-align:center;
+      animation: pop .18s ease-out;
+    }
+    @keyframes pop{
+      from{ transform: translateY(8px) scale(.98); opacity:0; }
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+    .yay{
+      font-size:42px;
+      font-weight:900;
+      margin:0 0 14px;
+      color:#111;
+    }
+    .ok{
+      padding:12px 20px;
+      border-radius:999px;
+      background:#111;
+      color:#fff;
+      border:none;
+      font-weight:800;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="heartWrap"><div class="heart"></div></div>
+
+    <h1>
+      <span class="name" id="name">Taif</span>
+      will you be my valentine?
+    </h1>
+
+    <p>Choose "Yes"</p>
+
+    <div class="arena" id="arena">
+      <button id="yes" type="button">Yes</button>
+      <button id="no" type="button">No</button>
+    </div>
+
+    <div class="hint">"No" seems a bit shy</div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="box">
+      <div class="yay">Yaay</div>
+      <button class="ok" id="ok" type="button">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("no");
+    const modal = document.getElementById("modal");
+
+    function moveNoFar(){
+      const a = arena.getBoundingClientRect();
+      const bw = noBtn.offsetWidth;
+      const bh = noBtn.offsetHeight;
+      const pad = 8;
+
+      const cur = noBtn.getBoundingClientRect();
+      const curCx = cur.left + cur.width/2;
+      const curCy = cur.top + cur.height/2;
+
+      // Pick the farthest among multiple random positions
+      let best = {x:pad, y:pad, d:-1};
+      const tries = 14;
+
+      for(let i=0;i<tries;i++){
+        const x = pad + Math.random() * (a.width  - bw - pad);
+        const y = pad + Math.random() * (a.height - bh - pad);
+
+        const candCx = a.left + x + bw/2;
+        const candCy = a.top  + y + bh/2;
+        const d = Math.hypot(candCx - curCx, candCy - curCy);
+
+        if(d > best.d) best = {x,y,d};
+      }
+
+      noBtn.style.transition = "left .10s ease-out, top .10s ease-out";
+      noBtn.style.left = best.x + "px";
+      noBtn.style.top  = best.y + "px";
+    }
+
+    // Run away when user tries to press No
+    noBtn.addEventListener("pointerdown", (e)=>{
+      e.preventDefault();
+      moveNoFar();
+    });
+
+    // Also run away if they tap near it (mobile)
+    arena.addEventListener("touchstart", (e)=>{
+      const t = e.touches && e.touches[0];
+      if(!t) return;
+      const r = noBtn.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const cy = r.top + r.height/2;
+      const dist = Math.hypot(t.clientX - cx, t.clientY - cy);
+      if(dist < 140) moveNoFar();
+    }, {passive:true});
+
+    // Yes -> popup
+    document.getElementById("yes").addEventListener("click", ()=>{
+      modal.classList.add("show");
+    });
+    document.getElementById("ok").addEventListener("click", ()=>{
+      modal.classList.remove("show");
+    });
+    modal.addEventListener("click", (e)=>{
+      if(e.target === modal) modal.classList.remove("show");
+    });
+
+    // Optional name: ?name=Taif
+    const params = new URLSearchParams(location.search);
+    const nm = params.get("name");
+    if(nm) document.getElementById("name").textContent = nm;
+  </script>
+</body>
+</html>
