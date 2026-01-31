@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Valentine</title>
+
+<style>
+:root{
+  --pink:#ff4fa0;
+  --pink2:#ff7bbf;
+  --card:rgba(255,255,255,.9);
+  --shadow:0 18px 45px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 20% 20%, #ffd1e4 0%, transparent 60%),
+    radial-gradient(1200px 700px at 80% 30%, #ffe0ef 0%, transparent 55%),
+    linear-gradient(135deg, #ffb9d6, #ffd8ea 55%, #ffbfe0);
+}
+
+.card{
+  width:min(520px,92vw);
+  padding:40px 28px;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+
+/* hamster image */
+.hamster{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  margin:0 auto 14px;
+  object-fit:cover;
+  box-shadow:0 12px 25px rgba(0,0,0,.18);
+}
+
+/* heart above text */
+.heart{
+  font-size:64px;
+  margin-bottom:10px;
+}
+
+h1{
+  margin:0 0 10px;
+  font-size:32px;
+  line-height:1.1;
+}
+.name{font-weight:900}
+
+p{opacity:.75;margin-bottom:18px}
+
+.buttons{
+  position:relative;
+  width:100%;
+  height:90px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+button{
+  border:none;
+  font-size:18px;
+  font-weight:900;
+  padding:16px 32px;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+#yes{
+  background:linear-gradient(135deg,var(--pink),var(--pink2));
+  color:white;
+  box-shadow:0 18px 40px rgba(255,79,160,.35);
+  z-index:1;
+}
+
+#no{
+  position:absolute;
+  left:20px;
+  background:white;
+  box-shadow:0 14px 30px rgba(0,0,0,.15);
+}
+
+/* modal */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  background:rgba(0,0,0,.3);
+}
+.modal.show{display:grid}
+.box{
+  background:white;
+  padding:28px;
+  border-radius:22px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.yay{font-size:42px;font-weight:900;margin-bottom:10px}
+.ok{
+  padding:12px 20px;
+  border-radius:999px;
+  background:#111;
+  color:white;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <!-- embedded hamster image -->
+  <img class="hamster"
+  src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEBAPEA8PDw8PDw8PDw8PDw8PDw8PFREWFhURFRUYHSggGBolHRUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OGhAQGi0lHyUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKABNwMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABQYBAwQCB//EADkQAAEDAgQDBQYEBwAAAAAAAAEAAgMEEQUSITEGEyJBUWFxgZEykaGx0fAHI1Jy4fDxQ2L/xAAZAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/xAAkEQEBAAICAgIDAQAAAAAAAAAAAQIRAyExEkFRBRMiMmFxgf/aAAwDAQACEQMRAD8A9QoooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//Z"
+  alt="hamster" />
+
+  <div class="heart">💗</div>
+
+  <h1>
+    <span class="name" id="name">Taif</span><br>
+    will you be my valentine?
+  </h1>
+
+  <p>Choose “Yes” 🥺</p>
+
+  <div class="buttons" id="arena">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+
+</div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="yay">Yaay 💖</div>
+    <button class="ok" onclick="modal.classList.remove('show')">OK</button>
+  </div>
+</div>
+
+<script>
+const noBtn = document.getElementById("no");
+const arena = document.getElementById("arena");
+const modal = document.getElementById("modal");
+
+function moveNoFar(){
+  const a = arena.getBoundingClientRect();
+  const bw = noBtn.offsetWidth;
+  const bh = noBtn.offsetHeight;
+  const pad = 8;
+
+  const x = pad + Math.random() * (a.width - bw - pad);
+  const y = pad + Math.random() * (a.height - bh - pad);
+
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
+}
+
+noBtn.addEventListener("pointerdown", e=>{
+  e.preventDefault();
+  moveNoFar();
+});
+
+document.getElementById("yes").onclick = ()=>{
+  modal.classList.add("show");
+};
+</script>
+
+</body>
+</html>
